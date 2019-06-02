@@ -7,7 +7,7 @@ module.exports = buildSchema(`
         income: Int!
         timeout: String
         status: String
-        user: User!
+        user: User
     }
     
     type Size {
@@ -18,9 +18,8 @@ module.exports = buildSchema(`
     }
 
     type User {
-        _id: ID
-        telephone: String
-        status: Boolean
+        _id: ID!
+        telephone: String!
     }
 
     input SizeInput {
@@ -33,12 +32,16 @@ module.exports = buildSchema(`
     input LockerInput {
         locker: Int!
         income: Int!
-        status: String
-        timeout: String
+        status: String!
+        timeout: String!
     }
 
-    input UserInput {
-        telephone: String!
+    input UserAndRentLockerInput {
+        _id: String!,
+        telephone: String!,
+        income: Int!,
+        timeout: String!,
+        status: String!,
     }
 
     type RootQuery {
@@ -49,8 +52,8 @@ module.exports = buildSchema(`
 
     type RootMutation {
         createSize(size: SizeInput): Size
+        createUserAndRentLocker(locker: UserAndRentLockerInput): [Locker!]!
         createLocker(locker: LockerInput): Locker
-        createUser(user: UserInput): User
     }
 
     schema {

@@ -15,7 +15,7 @@ let schema = new Schema({
     type: Number
   },
   timeout: {
-    type: Date
+    type: String
   },
   status: {
     type: String

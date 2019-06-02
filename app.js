@@ -1,31 +1,23 @@
 require("dotenv/config");
 const express = require("express");
-const connect = require("./helpers/connection");
+const app = express();
+const port = 8000;
+
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const graphqlHttp = require("express-graphql");
 const { buildSchema } = require("graphql");
-const FormatError = require("easygraphql-format-error");
 const cors = require("cors");
-var app = express();
-const port = 8000;
-const socketIO = require("socket.io");
 
 const graphqlSchema = require("./graphql/schema/index");
 const graphqlResolvers = require("./graphql/resolvers/index");
 
+const moduleFormatError = require("./formatError");
+const formatError = moduleFormatError.formatError;
+const errorName = moduleFormatError.errorName;
+
 app.use(bodyParser.json());
 app.use(cors());
-
-const formatError = new FormatError([
-  {
-    name: "TELEPHONE_HAS_EXISTS",
-    message: "The email is not valid",
-    statusCode: "400"
-  }
-]);
-// pass the errorName on the context
-const errorName = formatError.errorName;
 
 mongoose.set("useCreateIndex", true);
 mongoose
@@ -41,29 +33,22 @@ mongoose
   )
   .then(() => {
     const server = app.listen(port, () => {
-      console.log("running in port http://localhost:" + port);
+      console.log("connect to port http://localhost/", port);
+
+      require("./services/socket.io")(app, server);
     });
 
-    const io = socketIO.listen(server);
-
-    io.on("connection", client => {
-      console.log("user connected");
-
-      client.on("disconnect", () => {
-        console.log("user disconnected");
-      });
-
-      io.sockets.emit("new-message", "ss");
-    });
-
-    app.use(
-      "/graphql",
+    app.use("/graphql", (req, res) => {
       graphqlHttp({
         schema: graphqlSchema,
         rootValue: graphqlResolvers,
-        graphiql: true
-      })
-    );
+        graphiql: true,
+        context: { errorName },
+        customFormatErrorFn: err => {
+          return formatError.getError(err);
+        }
+      })(req, res);
+    });
   })
   .catch(err => {
     console.log(err);
