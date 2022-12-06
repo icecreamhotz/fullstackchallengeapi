@@ -11,11 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.5",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "easygraphql-format-error": "0.0.3",
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "express-graphql": "^0.8.0",
     "graphql": "^14.3.1",
     "mongoose": "^5.5.11",
